@@ -35,9 +35,19 @@ async fn run(body: Bytes) -> (StatusCode, String) {
         .map_err(|_| (StatusCode::BAD_REQUEST, "Invalid UTF-8".to_string()));
     match raw_data {
         Ok(data) => {
-            let opcode: u16 = match data.trim().parse() {
-                Ok(parsed_opcode) => parsed_opcode,
-                Err(_) => return (StatusCode::BAD_REQUEST, "Invalid opcode format".to_string()),
+            let trimmed_data = data.trim();
+            let opcode: u16 = if trimmed_data.starts_with("0x") || trimmed_data.starts_with("0X") {
+                // Parse hexadecimal (with 0x prefix)
+                match u16::from_str_radix(&trimmed_data[2..], 16) {
+                    Ok(parsed_opcode) => parsed_opcode,
+                    Err(_) => return (StatusCode::BAD_REQUEST, "Invalid hexadecimal opcode format".to_string()),
+                }
+            } else {
+                // Parse decimal (default behavior)
+                match trimmed_data.parse() {
+                    Ok(parsed_opcode) => parsed_opcode,
+                    Err(_) => return (StatusCode::BAD_REQUEST, "Invalid decimal opcode format".to_string()),
+                }
             };
 
             // Run the opcode on the VM instance
@@ -48,7 +58,7 @@ async fn run(body: Bytes) -> (StatusCode, String) {
 
             (
                 StatusCode::OK,
-                format!("Successfully ran opcode: {}", opcode),
+                format!("Successfully ran opcode: {} (0x{:x})", opcode, opcode),
             )
         }
         Err(error) => error,
