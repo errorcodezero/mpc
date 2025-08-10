@@ -38,6 +38,8 @@ impl VM {
                 }
             }
         }
+
+        self.instruc += 2;
     }
     fn get_opcode_nibbles(&self) -> [u8; 4] {
         let pt1 = self.mem[self.instruc];
@@ -54,6 +56,10 @@ impl VM {
 
         [n1, n2]
     }
+    fn insert_opcode(&mut self, opcode: u16) {
+        self.mem[self.instruc] = (opcode >> 8) as u8;
+        self.mem[self.instruc + 1] = opcode as u8;
+    }
 }
 
 impl Default for VM {
@@ -62,6 +68,7 @@ impl Default for VM {
             mem: Vec::with_capacity(MEMORY),
             regs: [0; 16],
             instruc: 0,
+            halted: false,
         }
     }
 }
