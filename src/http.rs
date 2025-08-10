@@ -18,7 +18,8 @@ pub async fn main() {
     let app = Router::new()
         // `GET /` goes to `root`
         .route("/", get(root))
-        .route("/run", post(run));
+        .route("/run", post(run))
+        .route("/state", get(get_vm_state));
 
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
@@ -52,4 +53,36 @@ async fn run(body: Bytes) -> (StatusCode, String) {
         }
         Err(error) => error,
     }
+}
+
+async fn get_vm_state() -> (StatusCode, String) {
+    let vm = VM_INSTANCE.lock().unwrap();
+    
+    let mut output = String::new();
+    
+    // Display registers (A through F based on typical naming)
+    let registers = vm.get_registers();
+    let register_names = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
+    
+    for (i, name) in register_names.iter().enumerate() {
+        output.push_str(&format!("Register {}: 0x{:x}\n", name, registers[i]));
+    }
+    
+    // Display special registers
+    output.push_str(&format!("Accumulator: 0x{:x}\n", vm.get_accumulator()));
+    output.push_str(&format!("Instruction Pointer: 0x{:x}\n", vm.get_instruction_pointer()));
+    output.push_str(&format!("Stack Pointer: 0x{:x}\n", vm.get_stack_pointer()));
+    output.push_str(&format!("Base Pointer: 0x{:x}\n", vm.get_base_pointer()));
+    output.push_str(&format!("Status Register: 0x{:x}\n", vm.get_status_register()));
+    
+    // Display non-zero memory addresses
+    output.push_str("Memory:\n");
+    let memory = vm.get_memory();
+    for (addr, &value) in memory.iter().enumerate() {
+        if value != 0 {
+            output.push_str(&format!("0x{:x} -> 0x{:x}\n", addr, value));
+        }
+    }
+    
+    (StatusCode::OK, output)
 }

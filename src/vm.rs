@@ -174,6 +174,39 @@ impl VM {
         self.insert_opcode(opcode);
         self.step();
     }
+
+    // Public methods to access VM state
+    pub fn get_registers(&self) -> &[u16; 16] {
+        &self.regs
+    }
+
+    pub fn get_accumulator(&self) -> u16 {
+        self.accum
+    }
+
+    pub fn get_instruction_pointer(&self) -> usize {
+        self.instruc
+    }
+
+    pub fn get_stack_pointer(&self) -> usize {
+        self.sp
+    }
+
+    pub fn get_memory(&self) -> &[u8; MEMORY + 1] {
+        &self.mem
+    }
+
+    pub fn get_base_pointer(&self) -> usize {
+        // Assuming base pointer is stored in register 15 or similar
+        // You may need to adjust this based on your VM architecture
+        self.regs[15] as usize
+    }
+
+    pub fn get_status_register(&self) -> u16 {
+        // Assuming status register is stored in register 14 or similar
+        // You may need to adjust this based on your VM architecture
+        self.regs[14]
+    }
 }
 
 impl Default for VM {
