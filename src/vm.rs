@@ -40,7 +40,9 @@ impl VM {
         if !self.halted {
             match opcode[0] {
                 LOAD_IMMEDIATE => {
-                    self.regs[opcode[1] as usize] = ((self.regs[2]) << 8) | (self.regs[3]);
+                    self.regs[opcode[1] as usize] =
+                        (((opcode[2]) as u16) << 8) | ((opcode[3]) as u16);
+                    println!("LOAD_IMMEDIATE")
                 }
                 // LOAD_FROM_MEM => {
                 //     let index = (((self.regs[2] as u16) << 8) | (self.regs[3] as u16));
@@ -140,7 +142,7 @@ impl VM {
                     self.halted = true;
                     println!("HALT");
                 }
-                _ => (),
+                _ => println!("{:#?}", opcode),
             }
         }
 
