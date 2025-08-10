@@ -19,7 +19,7 @@ const DUMP_ACCUM: u8 = 0x10;
 const PUSH_ACCUM: u8 = 0x11;
 
 pub struct VM {
-    mem: Vec<u8>,
+    mem: [u8; MEMORY + 1],
     // like 6502 where last register is for setting flags
     regs: [u16; 16],
     accum: u16,
@@ -31,6 +31,11 @@ pub struct VM {
 impl VM {
     fn step(&mut self) {
         let opcode = self.get_opcode_nibbles();
+
+        // println!(
+        //     "{:X} {:X} {:X} {:X}",
+        //     opcode[0], opcode[1], opcode[2], opcode[3]
+        // );
 
         if !self.halted {
             match opcode[0] {
@@ -148,11 +153,14 @@ impl VM {
         let n1 = self.byte_to_nibbles(pt1);
         let n2 = self.byte_to_nibbles(pt2);
 
+        // println!("{:X} {:X}", pt1, pt2);
+        // println!("{:X} {:X} {:X} {:X}", n1[0], n1[1], n2[0], n2[1]);
+
         [n1[0], n1[1], n2[0], n2[1]]
     }
     fn byte_to_nibbles(&self, byte: u8) -> [u8; 2] {
         let n1 = byte >> 4;
-        let n2 = byte & (0xF << 4);
+        let n2 = byte & 0xF;
 
         [n1, n2]
     }
@@ -169,7 +177,7 @@ impl VM {
 impl Default for VM {
     fn default() -> Self {
         Self {
-            mem: Vec::with_capacity(MEMORY + 1),
+            mem: [0; MEMORY + 1],
             regs: [0; 16],
             instruc: 0,
             sp: MEMORY,
