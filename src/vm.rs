@@ -144,7 +144,7 @@ impl VM {
         self.mem[self.instruc] = (opcode >> 8) as u8;
         self.mem[self.instruc + 1] = opcode as u8;
     }
-    fn run(&mut self, opcode: u16) {
+    pub fn run(&mut self, opcode: u16) {
         self.insert_opcode(opcode);
         self.step();
     }
