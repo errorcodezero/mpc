@@ -11,11 +11,11 @@ use cli::Args;
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let args = Args::parse();
     match args {
-        Args::Server => {
-            http::main().await;
+        Args::Server { ip, port }  => {
+            http::main(ip, port).await;
         }
-        Args::Client { ip } => {
-            client::run_client(ip).await?;
+        Args::Client { ip, port } => {
+            client::run_client(ip, port).await?;
         }
     }
     Ok(())

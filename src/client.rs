@@ -127,8 +127,8 @@ impl Client {
     }
 }
 
-pub async fn run_client(ip: IpAddr) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let client = Client::new(ip, 3000); // Default port from server
+pub async fn run_client(ip: IpAddr, port: u16) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let client = Client::new(ip, port); // Default port from server
     
     // Test connection
     if let Err(e) = client.check_connection().await {

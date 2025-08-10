@@ -5,13 +5,13 @@ use axum::{
     http::StatusCode,
     routing::{get, post},
 };
-use std::sync::{Arc, Mutex};
+use std::{net::IpAddr, sync::{Arc, Mutex}};
 
 // Global VM instance wrapped in Arc<Mutex<>> for thread safety
 static VM_INSTANCE: std::sync::LazyLock<Arc<Mutex<VM>>> =
     std::sync::LazyLock::new(|| Arc::new(Mutex::new(VM::default())));
 
-pub async fn main() {
+pub async fn main(ip: IpAddr, port: u16) {
     tracing_subscriber::fmt::init();
 
     // build our application with a route
@@ -22,7 +22,8 @@ pub async fn main() {
         .route("/state", get(get_vm_state));
 
     // run our app with hyper, listening globally on port 3000
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind(format!("{}:{}", ip, port)).await.unwrap();
+    println!("server listening on {}:{}", ip, port);
     axum::serve(listener, app).await.unwrap();
 }
 
