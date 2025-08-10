@@ -47,77 +47,93 @@ impl VM {
                     let index = (((opcode[2] as u16) << 8) | (opcode[3] as u16)) as usize;
                     self.mem[index] = (reg >> 8) as u8;
                     self.mem[index + 1] = reg as u8;
+                    println!("DUMP");
                 }
                 ADD => {
                     let reg1 = self.regs[opcode[1] as usize];
                     let reg2 = self.regs[opcode[2] as usize];
                     self.accum = reg1 + reg2;
+                    println!("ADD");
                 }
                 SUB => {
                     let reg1 = self.regs[opcode[1] as usize];
                     let reg2 = self.regs[opcode[2] as usize];
                     self.accum = reg1 - reg2;
+                    println!("SUB");
                 }
                 MULT => {
                     let reg1 = self.regs[opcode[1] as usize];
                     let reg2 = self.regs[opcode[2] as usize];
                     self.accum = reg1 * reg2;
+                    println!("MULT");
                 }
                 DIV => {
                     let reg1 = self.regs[opcode[1] as usize];
                     let reg2 = self.regs[opcode[2] as usize];
                     self.accum = reg1 / reg2;
+                    println!("DIV");
                 }
                 AND => {
                     let reg1 = self.regs[opcode[1] as usize];
                     let reg2 = self.regs[opcode[2] as usize];
                     self.accum = reg1 & reg2;
+                    println!("AND");
                 }
                 OR => {
                     let reg1 = self.regs[opcode[1] as usize];
                     let reg2 = self.regs[opcode[2] as usize];
                     self.accum = reg1 | reg2;
+                    println!("OR");
                 }
                 NOT => {
                     let reg1 = self.regs[opcode[1] as usize];
                     self.accum = !reg1;
+                    println!("NOT");
                 }
                 XOR => {
                     let reg1 = self.regs[opcode[1] as usize];
                     let reg2 = self.regs[opcode[2] as usize];
                     self.accum = reg1 ^ reg2;
+                    println!("XOR");
                 }
                 LSHIFT => {
                     let reg1 = self.regs[opcode[1] as usize];
                     self.accum = reg1 << opcode[2];
+                    println!("LSHIFT");
                 }
                 RSHIFT => {
                     let reg1 = self.regs[opcode[1] as usize];
                     self.accum = reg1 >> opcode[2];
+                    println!("RSHIFT");
                 }
                 PUSH => {
                     let reg = self.regs[opcode[1] as usize];
                     self.mem[self.sp] = reg as u8;
                     self.mem[self.sp - 1] = (reg >> 8) as u8;
                     self.sp -= 2;
+                    println!("PUSH");
                 }
                 POP => {
                     self.regs[opcode[1] as usize] =
                         ((self.mem[self.sp + 2] as u16) << 8) | (self.mem[self.sp + 1] as u16);
                     self.sp += 2;
+                    println!("POP");
                 }
                 DUMP_ACCUM => {
                     let index = (((opcode[2] as u16) << 8) | (opcode[3] as u16)) as usize;
                     self.mem[index] = (self.accum >> 8) as u8;
                     self.mem[index + 1] = self.accum as u8;
+                    println!("DUMP_ACCUM");
                 }
                 PUSH_ACCUM => {
                     self.mem[self.sp] = self.accum as u8;
                     self.mem[self.sp - 1] = (self.accum >> 8) as u8;
                     self.sp -= 2;
+                    println!("PUSH_ACCUM");
                 }
                 HALT => {
                     self.halted = true;
+                    println!("HALT");
                 }
                 _ => (),
             }
